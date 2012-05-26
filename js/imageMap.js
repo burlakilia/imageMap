@@ -26,6 +26,7 @@
         'imgHeight': 1000,    // высота картинки в пикселях
         'isAdmin': false,
         'isMobile': false,
+        'jsonUrl': 'data/houses.json', // путь к файлу или сервису с описанием земель
         
         'onSelect': function(data) {console.log (data)},
         'onUnselect': function() {console.log('unselect');}
@@ -91,8 +92,12 @@
                     'externalProjection': new OpenLayers.Projection( this.map.baseLayer.projection)
                 };
                 var geojsonWriter = new OpenLayers.Format.GeoJSON(out_options);
-                var str = geojsonWriter.write(this.newPlacesLayer.features[0], false);
-
+                
+                if (this.newPlacesLayer.features && this.newPlacesLayer.features.length > 0) {
+                	var str = geojsonWriter.write(this.newPlacesLayer.features[0], false);
+				} else {
+					return undefined;
+				}
                 var start = str.indexOf('"coordinates":') + '"coordinates":['.length;
                 var end = str.indexOf('"crs":') - ']},'.length;
 
@@ -139,7 +144,7 @@
         addFeatures: function(url) {
             var self = this;
             
-            $.getJSON('data/houses.json', function(places) {
+            $.getJSON(settings.jsonUrl, function(places) {
                 var newLayer = new OpenLayers.Layer.Vector("Свободные", {
                     "styleMap": new OpenLayers.StyleMap(layersStyle['new']['checked'])
                 });
